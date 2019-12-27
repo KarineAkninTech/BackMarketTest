@@ -78,6 +78,17 @@ def filter_valid_records(df):
         raise Exception(error)
 
 
+def filter_invalid_records(df):
+
+    try:
+        invalid_df = df.filter(col("image").isNull())
+        logger.info("SUCCESS: Filter found {} invalid rows".format(str(invalid_df.count())))
+        return invalid_df
+    except Exception as error:
+        logger.error("FAILURE: Unable to filter Dataframe on  Null values for column image: {}".format(str(error)))
+        raise Exception(error)
+
+
 def main(source, ingress_dir, parquet_dir, valid_dir, invalid_dir, archive_dir):
 
     csv_path, parquet_path, valid_path, invalid_path, archive_path = \
@@ -87,6 +98,7 @@ def main(source, ingress_dir, parquet_dir, valid_dir, invalid_dir, archive_dir):
         csv_to_parquet(spark, csv_path, parquet_path)
         df = create_dataframe(spark, parquet_path)
         valid_df = filter_valid_records(df)
+        invalid_df = filter_invalid_records(df)
         spark.stop()
     else:
         logger.info("ABORTING: File already proccess, found in {}, ending spark job".format(archive_path))
