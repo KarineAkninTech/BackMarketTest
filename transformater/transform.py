@@ -42,12 +42,26 @@ def init_spark():
         raise Exception(error)
 
 
+def csv_to_parquet(spark, csv_path, parquet_path):
+
+    try:
+        df = spark.read.format("csv").option("header", "true").load(csv_path)
+        logger.info("SUCCESS: read {} rows in csv file {}".format(str(df.count()), csv_path))
+        df.coalesce(1).write.mode("overwrite").parquet(parquet_path)
+        logger.info("SUCCESS: write {} rows on parquet file {}".format(str(df.count()), parquet_path))
+    except Exception as error:
+        logger.error("FAILURE: Cannot transform csv {} to parquet file {} : {}"
+                     .format(csv_path, parquet_path, str(error)))
+        raise Exception(error)
+
+
 def main(source, ingress_dir, parquet_dir, valid_dir, invalid_dir, archive_dir):
 
     csv_path, parquet_path, valid_path, invalid_path, archive_path = \
         generate_paths(source, ingress_dir, parquet_dir, valid_dir, invalid_dir, archive_dir)
     if not is_file_already_processed(archive_path):
         spark = init_spark()
+        csv_to_parquet(spark, csv_path, parquet_path)
         spark.stop()
     else:
         logger.info("ABORTING: File already proccess, found in {}, ending spark job".format(archive_path))
