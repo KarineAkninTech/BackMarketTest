@@ -2,6 +2,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 import sys
 import datetime
+import os
 
 from pyspark.sql import SparkSession
 
@@ -26,6 +27,10 @@ def generate_paths(source, ingress_dir, parquet_dir, valid_dir, invalid_dir, arc
     return csv_path, parquet_path, valid_path, invalid_path, archive_path
 
 
+def is_file_already_processed(archive_path):
+    return os.path.isfile(archive_path)
+
+
 def init_spark():
 
     try:
@@ -41,8 +46,11 @@ def main(source, ingress_dir, parquet_dir, valid_dir, invalid_dir, archive_dir):
 
     csv_path, parquet_path, valid_path, invalid_path, archive_path = \
         generate_paths(source, ingress_dir, parquet_dir, valid_dir, invalid_dir, archive_dir)
-    spark = init_spark()
-    spark.stop()
+    if not is_file_already_processed(archive_path):
+        spark = init_spark()
+        spark.stop()
+    else:
+        logger.info("ABORTING: File already proccess, found in {}, ending spark job".format(archive_path))
 
 
 if __name__ == '__main__':
