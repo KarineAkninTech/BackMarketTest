@@ -12,8 +12,22 @@ file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
 
+def generate_paths(source, ingress_dir, parquet_dir, valid_dir, invalid_dir, archive_dir):
+
+    csv_path = ingress_dir + "product_catalog.csv"
+    parquet_path = parquet_dir + source + "/product_catalog.parquet"
+    valid_path = valid_dir + source + "/product_catalog.csv"
+    invalid_path = invalid_dir + source + "/product_catalog.csv"
+    archive_path = archive_dir + source + "/product_catalog.csv"
+    logger.info("SUCCESS: create datalake paths :\n{}\n{}\n{}\n{}\n{}"
+                .format(csv_path, parquet_path, valid_path, invalid_path, archive_path))
+    return csv_path, parquet_path, valid_path, invalid_path, archive_path
+
+
 def main(source, ingress_dir, parquet_dir, valid_dir, invalid_dir, archive_dir):
-    print("main function")
+
+    csv_path, parquet_path, valid_path, invalid_path, archive_path = \
+        generate_paths(source, ingress_dir, parquet_dir, valid_dir, invalid_dir, archive_dir)
 
 
 if __name__ == '__main__':
