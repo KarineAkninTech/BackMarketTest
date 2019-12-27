@@ -55,6 +55,17 @@ def csv_to_parquet(spark, csv_path, parquet_path):
         raise Exception(error)
 
 
+def create_dataframe(spark, parquet_path):
+
+    try:
+        df = spark.read.format("parquet").load(parquet_path).cache()
+        logger.info("SUCCESS: read {} rows in parquet file {}".format(str(df.count()), parquet_path))
+        return df
+    except Exception as error:
+        logger.error("FAILURE: Unable to read data from parquet file {}: {}".format(parquet_path, str(error)))
+        raise Exception(error)
+
+
 def main(source, ingress_dir, parquet_dir, valid_dir, invalid_dir, archive_dir):
 
     csv_path, parquet_path, valid_path, invalid_path, archive_path = \
@@ -62,6 +73,7 @@ def main(source, ingress_dir, parquet_dir, valid_dir, invalid_dir, archive_dir):
     if not is_file_already_processed(archive_path):
         spark = init_spark()
         csv_to_parquet(spark, csv_path, parquet_path)
+        df = create_dataframe(spark, parquet_path)
         spark.stop()
     else:
         logger.info("ABORTING: File already proccess, found in {}, ending spark job".format(archive_path))
