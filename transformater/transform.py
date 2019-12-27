@@ -1,6 +1,7 @@
 import logging
 from logging.handlers import RotatingFileHandler
 import sys
+import datetime
 
 logger = logging.getLogger('pyspark')
 logger.setLevel(logging.INFO)
@@ -10,9 +11,37 @@ file_handler.setLevel(logging.INFO)
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
+
+def main(source, ingress_dir, parquet_dir, valid_dir, invalid_dir, archive_dir):
+    print("main function")
+
+
 if __name__ == '__main__':
+
     if len(sys.argv) != 7:
         logger.error(
             "USAGE: transform.py <source> <ingress_dir> <parquet_dir> <valid_dir> <invalid_dir> <archive_dir>".format())
         exit(-1)
+
+    logger.info("==================================================")
+    logger.info("==== STARTING TRANSFORM: {} =====".format(datetime.datetime.now().strftime('%d/%m/%Y %H:%M:%S')))
+    logger.info("==================================================")
+
+    try:
+        main(
+            source=sys.argv[1],
+            ingress_dir=sys.argv[2],
+            parquet_dir=sys.argv[3],
+            valid_dir=sys.argv[4],
+            invalid_dir=sys.argv[5],
+            archive_dir=sys.argv[6]
+
+        )
+    except Exception as error:
+        logger.fatal(str(error))
+
+    finally:
+        logger.info("==================================================")
+        logger.info("================ END OF TRANSFORM ================")
+        logger.info("==================================================")
 
