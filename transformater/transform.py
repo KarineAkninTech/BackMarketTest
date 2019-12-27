@@ -5,6 +5,7 @@ import datetime
 import os
 
 from pyspark.sql import SparkSession
+from pyspark.sql.functions import *
 
 logger = logging.getLogger('pyspark')
 logger.setLevel(logging.INFO)
@@ -66,6 +67,17 @@ def create_dataframe(spark, parquet_path):
         raise Exception(error)
 
 
+def filter_valid_records(df):
+
+    try:
+        valid_df = df.filter(col("image").isNotNull())
+        logger.info("SUCCESS: Filter found {} valid rows".format(str(valid_df.count())))
+        return valid_df
+    except Exception as error:
+        logger.error("FAILURE: Unable to filter Dataframe on Not Null values for column image: {}".format(str(error)))
+        raise Exception(error)
+
+
 def main(source, ingress_dir, parquet_dir, valid_dir, invalid_dir, archive_dir):
 
     csv_path, parquet_path, valid_path, invalid_path, archive_path = \
@@ -74,6 +86,7 @@ def main(source, ingress_dir, parquet_dir, valid_dir, invalid_dir, archive_dir):
         spark = init_spark()
         csv_to_parquet(spark, csv_path, parquet_path)
         df = create_dataframe(spark, parquet_path)
+        valid_df = filter_valid_records(df)
         spark.stop()
     else:
         logger.info("ABORTING: File already proccess, found in {}, ending spark job".format(archive_path))
