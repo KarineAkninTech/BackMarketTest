@@ -89,6 +89,16 @@ def filter_invalid_records(df):
         raise Exception(error)
 
 
+def write_dataframe_to_csv(df, dest_path):
+
+    try:
+        df.coalesce(1).write.mode("overwrite").option("header", "true").csv(dest_path)
+        logger.info("SUCCESS: write {} rows on csv file {}".format(str(df.count()), dest_path))
+    except Exception as error:
+        logger.error("FAILURE: Unable to write Dataframe to csv file {}: {}".format(dest_path, str(error)))
+        raise Exception(error)
+
+
 def main(source, ingress_dir, parquet_dir, valid_dir, invalid_dir, archive_dir):
 
     csv_path, parquet_path, valid_path, invalid_path, archive_path = \
@@ -99,6 +109,7 @@ def main(source, ingress_dir, parquet_dir, valid_dir, invalid_dir, archive_dir):
         df = create_dataframe(spark, parquet_path)
         valid_df = filter_valid_records(df)
         invalid_df = filter_invalid_records(df)
+        write_dataframe_to_csv(valid_df, valid_path)
         spark.stop()
     else:
         logger.info("ABORTING: File already proccess, found in {}, ending spark job".format(archive_path))
