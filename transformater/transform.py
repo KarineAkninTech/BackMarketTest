@@ -3,6 +3,7 @@ from logging.handlers import RotatingFileHandler
 import sys
 import datetime
 import os
+import shutil
 
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
@@ -99,6 +100,18 @@ def write_dataframe_to_csv(df, dest_path):
         raise Exception(error)
 
 
+def archive_input_csv(archive_dir, source, csv_path, archive_path):
+
+    try:
+        if not os.path.exists(archive_dir + source):
+            os.mkdir(archive_dir + source)
+        shutil.move(csv_path, archive_path)
+        logger.info("SUCCESS: archive csv file {} to {}".format(csv_path, archive_path))
+    except Exception as error:
+        logger.error("FAILURE: Unable to move csv file to archive folder: {}".format(str(error)))
+        raise Exception(error)
+
+
 def main(source, ingress_dir, parquet_dir, valid_dir, invalid_dir, archive_dir):
 
     csv_path, parquet_path, valid_path, invalid_path, archive_path = \
@@ -111,6 +124,7 @@ def main(source, ingress_dir, parquet_dir, valid_dir, invalid_dir, archive_dir):
         invalid_df = filter_invalid_records(df)
         write_dataframe_to_csv(valid_df, valid_path)
         write_dataframe_to_csv(invalid_df, invalid_path)
+        archive_input_csv(archive_dir, source, csv_path, archive_path)
         spark.stop()
     else:
         logger.info("ABORTING: File already proccess, found in {}, ending spark job".format(archive_path))
