@@ -3,6 +3,8 @@ from logging.handlers import RotatingFileHandler
 import sys
 import datetime
 
+from pyspark.sql import SparkSession
+
 logger = logging.getLogger('pyspark')
 logger.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
@@ -24,10 +26,23 @@ def generate_paths(source, ingress_dir, parquet_dir, valid_dir, invalid_dir, arc
     return csv_path, parquet_path, valid_path, invalid_path, archive_path
 
 
+def init_spark():
+
+    try:
+        spark = SparkSession.builder.master("local[*]").appName("transformater").getOrCreate()
+        logger.info("SUCCESS: create Spark Session with appName 'transformater'")
+        return spark
+    except Exception as error:
+        logger.error("FAILURE: cannot create Spark Session: {}".format(str(error)))
+        raise Exception(error)
+
+
 def main(source, ingress_dir, parquet_dir, valid_dir, invalid_dir, archive_dir):
 
     csv_path, parquet_path, valid_path, invalid_path, archive_path = \
         generate_paths(source, ingress_dir, parquet_dir, valid_dir, invalid_dir, archive_dir)
+    spark = init_spark()
+    spark.stop()
 
 
 if __name__ == '__main__':
