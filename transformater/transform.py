@@ -110,6 +110,7 @@ def main(source, ingress_dir, parquet_dir, valid_dir, invalid_dir, archive_dir):
         valid_df = filter_valid_records(df)
         invalid_df = filter_invalid_records(df)
         write_dataframe_to_csv(valid_df, valid_path)
+        write_dataframe_to_csv(invalid_df, invalid_path)
         spark.stop()
     else:
         logger.info("ABORTING: File already proccess, found in {}, ending spark job".format(archive_path))
