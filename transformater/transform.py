@@ -1,5 +1,6 @@
 import logging
 from logging.handlers import RotatingFileHandler
+import sys
 
 logger = logging.getLogger('pyspark')
 logger.setLevel(logging.INFO)
@@ -10,4 +11,8 @@ file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
 if __name__ == '__main__':
-    print("Here you go!")
+    if len(sys.argv) != 7:
+        logger.error(
+            "USAGE: transform.py <source> <ingress_dir> <parquet_dir> <valid_dir> <invalid_dir> <archive_dir>".format())
+        exit(-1)
+
