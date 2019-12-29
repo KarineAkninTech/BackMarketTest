@@ -66,7 +66,15 @@ def init_spark():
 
 
 def csv_to_parquet(spark, csv_path, parquet_path):
+    """
+    Read data from the csv_path to dataframe and write it to parquet on parquet_path using SparkSession.
+    Keep header info, overwrite the parquet file if already exists and use of coalesce(1) to write data on one file.
 
+    :param spark: The spark session object, SparkSession
+    :param csv_path: The path to csv file input, String
+    :param parquet_path: The path to parquet file output, String
+    :raise: an exception is raised if the reading or writing action cannot be performed, Exception
+    """
     try:
         df = spark.read.format("csv").option("header", "true").load(csv_path)
         logger.info("SUCCESS: read {} rows in csv file {}".format(str(df.count()), csv_path))
