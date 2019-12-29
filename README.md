@@ -15,4 +15,6 @@ os | linux
 
 For other requirements for python code, simply run :
 
-`$ pip install -r requirements.txt`
+`$ pip3 install -r requirements.txt`
+
+This command will install wget and pyspark package for python3.
