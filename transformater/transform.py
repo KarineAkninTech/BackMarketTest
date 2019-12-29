@@ -87,7 +87,14 @@ def csv_to_parquet(spark, csv_path, parquet_path):
 
 
 def create_dataframe(spark, parquet_path):
+    """
+    Read parquet file using SparkSession and create dataframe by inferring schema and cache it to memory level.
 
+    :param spark: The Spark Session, SparkSession
+    :param parquet_path: The path to parquet file, String
+    :return: the dataframe containing parquet file data, Dataframe
+    :raise: an exception is raised if the reading operation failed, Exception
+    """
     try:
         df = spark.read.format("parquet").load(parquet_path).cache()
         logger.info("SUCCESS: read {} rows in parquet file {}".format(str(df.count()), parquet_path))
@@ -98,7 +105,13 @@ def create_dataframe(spark, parquet_path):
 
 
 def filter_valid_records(df):
+    """
+    Filter a given dataframe on column 'image' not null generating a valid dataframe.
 
+    :param df: The dataframe to filter, Dataframe
+    :return: a dataframe with valid records, Dataframe
+    :raise: an exception is raised if the filter transformation failed, Exception
+    """
     try:
         valid_df = df.filter(col("image").isNotNull())
         logger.info("SUCCESS: Filter found {} valid rows".format(str(valid_df.count())))
@@ -109,6 +122,13 @@ def filter_valid_records(df):
 
 
 def filter_invalid_records(df):
+    """
+    Filter a given dataframe on column 'image' null generating a invalid dataframe.
+
+    :param df: The dataframe to filter, Dataframe
+    :return: a dataframe with invalid records, Dataframe
+    :raise: an exception is raised if the filter transformation failed, Exception
+    """
 
     try:
         invalid_df = df.filter(col("image").isNull())
