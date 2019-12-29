@@ -21,12 +21,12 @@ def generate_paths(source, ingress_dir, parquet_dir, valid_dir, invalid_dir, arc
     """
     Generate paths to interact with the datalake folder with a given source and the input file product_catalog.csv.
 
-    :param source: the source name, String
-    :param ingress_dir: the path to ingress folder, String
-    :param parquet_dir: the path to parquet folder, String
-    :param valid_dir: the path to valid folder, String
-    :param invalid_dir: the path to invalid folder, String
-    :param archive_dir: the path to archive folder, String
+    :param source: The source name, String
+    :param ingress_dir: The path to ingress folder, String
+    :param parquet_dir: The path to parquet folder, String
+    :param valid_dir: The path to valid folder, String
+    :param invalid_dir: The path to invalid folder, String
+    :param archive_dir: The path to archive folder, String
     :return: csv_path, parquet_path, valid_path, invalid_path, archive_path, String
     """
     csv_path = ingress_dir + "product_catalog.csv"
@@ -43,7 +43,7 @@ def is_file_already_processed(archive_path):
     """
     Check if the file given by the archive_path parameter already exists.
 
-    :param archive_path: path to the archive file in the archive directory, String
+    :param archive_path: Path to the archive file in the archive directory, String
     :return: True if file already exists, False if not, Boolean
     """
     return os.path.isfile(archive_path)
@@ -54,7 +54,7 @@ def init_spark():
     Init Spark Session with master set to local[*] and appName "transformater".
 
     :return: the Spark Session object, SparkSession
-    :raise: raise an exception if the Spark Session cannot be build, Exception
+    :raise: An exception is raised if the Spark Session cannot be build, Exception
     """
     try:
         spark = SparkSession.builder.master("local[*]").appName("transformater").getOrCreate()
@@ -73,7 +73,7 @@ def csv_to_parquet(spark, csv_path, parquet_path):
     :param spark: The spark session object, SparkSession
     :param csv_path: The path to csv file input, String
     :param parquet_path: The path to parquet file output, String
-    :raise: an exception is raised if the reading or writing action cannot be performed, Exception
+    :raise: An exception is raised if the reading or writing action cannot be performed, Exception
     """
     try:
         df = spark.read.format("csv").option("header", "true").load(csv_path)
@@ -92,8 +92,8 @@ def create_dataframe(spark, parquet_path):
 
     :param spark: The Spark Session, SparkSession
     :param parquet_path: The path to parquet file, String
-    :return: the dataframe containing parquet file data, Dataframe
-    :raise: an exception is raised if the reading operation failed, Exception
+    :return: The dataframe containing parquet file data, Dataframe
+    :raise: An exception is raised if the reading operation failed, Exception
     """
     try:
         df = spark.read.format("parquet").load(parquet_path).cache()
@@ -109,8 +109,8 @@ def filter_valid_records(df):
     Filter a given dataframe on column 'image' not null generating a valid dataframe.
 
     :param df: The dataframe to filter, Dataframe
-    :return: a dataframe with valid records, Dataframe
-    :raise: an exception is raised if the filter transformation failed, Exception
+    :return: A dataframe with valid records, Dataframe
+    :raise: An exception is raised if the filter transformation failed, Exception
     """
     try:
         valid_df = df.filter(col("image").isNotNull())
@@ -126,10 +126,9 @@ def filter_invalid_records(df):
     Filter a given dataframe on column 'image' null generating a invalid dataframe.
 
     :param df: The dataframe to filter, Dataframe
-    :return: a dataframe with invalid records, Dataframe
-    :raise: an exception is raised if the filter transformation failed, Exception
+    :return: A dataframe with invalid records, Dataframe
+    :raise: An exception is raised if the filter transformation failed, Exception
     """
-
     try:
         invalid_df = df.filter(col("image").isNull())
         logger.info("SUCCESS: Filter found {} invalid rows".format(str(invalid_df.count())))
@@ -140,7 +139,14 @@ def filter_invalid_records(df):
 
 
 def write_dataframe_to_csv(df, dest_path):
+    """
+    Write a dataframe to csv on destination path .
+    Overwrite the csv file if already exists, keeping header and use of coalesce(1) to write date on an unique csv file.
 
+    :param df: The dataframe to be writen, Dataframe
+    :param dest_path: The destination path for csv file
+    :raise: An exception is raised if the write action failed, Exception
+    """
     try:
         df.coalesce(1).write.mode("overwrite").option("header", "true").csv(dest_path)
         logger.info("SUCCESS: write {} rows on csv file {}".format(str(df.count()), dest_path))
@@ -150,7 +156,18 @@ def write_dataframe_to_csv(df, dest_path):
 
 
 def archive_input_csv(archive_dir, source, csv_path, archive_path):
+    """
+    Archive a given file from csv_path to archive_path.
 
+    This function will create a source folder on the archive directory if not exists and then moves the file
+    from csv_path to the archive path inside source directory.
+    Must prevents for recomputing a file twice.
+    :param archive_dir: The archive directory path, String
+    :param source: The source name for archive directory, String
+    :param csv_path: The csv path on ingress folder, String
+    :param archive_path: The archive path to move the csv file
+    :raise: An exception is raised if the archive action failed, Exception
+    """
     try:
         if not os.path.exists(archive_dir + source):
             os.mkdir(archive_dir + source)
