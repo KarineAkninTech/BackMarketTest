@@ -60,7 +60,9 @@ with the datalake folder, those would be given as arguments to the spark-submit 
 
 #### Data Pipeline
 This simple job will implement all the data pipeline in several step :
-image DAG
+
+![dag](https://github.com/KarineAkninTech/BackMarketTest/blob/dev/images/DAG.jpg)
+
 - the first step is to read the input file csv inside the ingress folder and 
 
 #### Datalake during each steps
