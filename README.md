@@ -59,26 +59,23 @@ mettre step du datalake à chaque read, write
 Be sure to meet all the requirements in the requirements section above
 
 ### Step 1
-
 install all requirements for python3 :
+
 `$ pip3 install -r requirements.txt`
 
 
 ### Step 2
-
 launch your spark cluster in standalone mode :
 
 `$ ./sbin/start-master.sh`
 
 ### Step 3
-
 Generate the datalake infrastructure :
 
 `$ python3 ./scripts/generate_datalake.py`
 
 
 ### Step 4
-
 Submit pyspark job to Spark master locally :
 
 `$ chmod +x submit.sh`
@@ -86,7 +83,6 @@ Submit pyspark job to Spark master locally :
 `$ ./submit.sh`
 
 ### Step 5
-
 During the pyspark job executing, a log file will be created in the root folder :
 
 `$ cat transform.log`
