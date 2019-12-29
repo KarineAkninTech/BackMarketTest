@@ -51,8 +51,24 @@ The datalake folder it's divided in 3 differents zones :
 
 The script generate_datalake.py can be used several times to rebuild all the datalake architecture.
 
+
 ### Pyspark Job
+The pyspark job can be found in the folder : transformater/transform.py
+
+It can be run by using the submit.sh script on the root directory. The script will automatically generate valid absolute paths to interact
+with the datalake folder, those would be given as arguments to the spark-submit command.
+
+#### Data Pipeline
+This simple job will implement all the data pipeline in several step :
+image DAG
+- the first step is to read the input file csv inside the ingress folder and 
+
+#### Datalake during each steps
 mettre step du datalake à chaque read, write
+
+#### errors handling et overwrite
+
+
 
 ## Running the pyspark job
 
