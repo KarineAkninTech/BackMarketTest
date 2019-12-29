@@ -8,7 +8,7 @@ This must be done by implementing a job in Python that will do the following ste
 2. Transform the file from CSV to Parquet format locally
 3. Separate the valid rows from the invalid ones into two separate files: the business wants only the product with an image but wants to archive the invalids rows
 
-To meet these requirements, I choose to use the Spark framework using pyspark and I emulate a Datalake locally (by running ./scripts/generate_datalake.py
+To meet these requirements, I choose to use the Spark framework using pyspark and I also decided to emulate a Datalake locally (by running ./scripts/generate_datalake.py)
 
 
 ## Requirements
@@ -66,12 +66,14 @@ install all requirements for python3 :
 
 ### Step 2
 
-launch your spark cluster in standolone mode :
+launch your spark cluster in standalone mode :
+
 `$ ./sbin/start-master.sh`
 
 ### Step 3
 
 Generate the datalake infrastructure :
+
 `$ python3 ./scripts/generate_datalake.py`
 
 
@@ -80,6 +82,7 @@ Generate the datalake infrastructure :
 Submit pyspark job to Spark master locally :
 
 `$ chmod +x submit.sh`
+
 `$ ./submit.sh`
 
 ### Step 5
@@ -87,5 +90,6 @@ Submit pyspark job to Spark master locally :
 During the pyspark job executing, a log file will be created in the root folder :
 
 `$ cat transform.log`
+
 `$ tail -500f transform.log` to read it during execution
 
