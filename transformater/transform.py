@@ -18,7 +18,17 @@ logger.addHandler(file_handler)
 
 
 def generate_paths(source, ingress_dir, parquet_dir, valid_dir, invalid_dir, archive_dir):
+    """
+    Generate paths to interact with the datalake folder with a given source and the input file product_catalog.csv.
 
+    :param source: the source name, String
+    :param ingress_dir: the path to ingress folder, String
+    :param parquet_dir: the path to parquet folder, String
+    :param valid_dir: the path to valid folder, String
+    :param invalid_dir: the path to invalid folder, String
+    :param archive_dir: the path to archive folder, String
+    :return: csv_path, parquet_path, valid_path, invalid_path, archive_path, String
+    """
     csv_path = ingress_dir + "product_catalog.csv"
     parquet_path = parquet_dir + source + "/product_catalog.parquet"
     valid_path = valid_dir + source + "/product_catalog.csv"
@@ -30,11 +40,22 @@ def generate_paths(source, ingress_dir, parquet_dir, valid_dir, invalid_dir, arc
 
 
 def is_file_already_processed(archive_path):
+    """
+    Check if the file given by the archive_path parameter already exists.
+
+    :param archive_path: path to the archive file in the archive directory, String
+    :return: True if file already exists, False if not, Boolean
+    """
     return os.path.isfile(archive_path)
 
 
 def init_spark():
+    """
+    Init Spark Session with master set to local[*] and appName "transformater".
 
+    :return: the Spark Session object, SparkSession
+    :raise: raise an exception if the Spark Session cannot be build, Exception
+    """
     try:
         spark = SparkSession.builder.master("local[*]").appName("transformater").getOrCreate()
         logger.info("SUCCESS: create Spark Session with appName 'transformater'")
