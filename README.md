@@ -72,8 +72,15 @@ This simple job will implement all the data pipeline in several steps :
 - step 7 : move the csv file from datalake/ingress/ to datalake/archive/product_catalog/, to prevent for recomputing twice the same file
 
 
-#### errors handling et overwrite
+#### Errors handling
 
+To prevent for duplicating data, a specific strategy has been done :
+- case 1 : the script ends properly :
+  - the file will be moved from ingress to archive at the end of the spark job, meaning all previous actions have been done
+  - a simple check of the file existing on the archive folder may prevents from recompute it twice
+- case 2 : the script did not end properly :
+  - the file remains in the ingress folder
+  - all the write action will overwrite the actual contents, meaning even if one write has been performed and not the others, every output files from every steps would be overwriten (no duplicate data)
 
 
 ## Running the pyspark job
