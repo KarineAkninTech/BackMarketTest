@@ -65,11 +65,11 @@ This simple job will implement all the data pipeline in several steps :
 
 - step 1 : create the SparkSession Object to use Spark Dataframe API
 - step 2 : read the csv file stored in datalake/ingress, will generate a Spark Dataframe containing data from csv with infering schema from header
-- step 3 : write the Dataframe to parquet file in datalake/raw/copyRawFiles/<source>/, with coalesce(1) to generate a unique parquet file (just one PART)
+- step 3 : write the Dataframe to parquet file in datalake/raw/copyRawFiles/product_catalog/, with coalesce(1) to generate a unique parquet file (just one PART)
 - step 4 : read the parquet file and cache the generate Dataframe in memory level, infering the schema : for next transformation, because of laziness, it is recommanded to cache the Dataframe to not recompute it twice
 - step 5 : two filters will be performed on the cached Dataframe. One for valid data on col('image') != Null and another for invalid data on col('image') == Null. Will generate two Dataframes
-- step 6 : write the two Dataframes as csv on the folder datalake/raw/valid/<source>/ and datalake/raw/invalid/<source>/, keeping the header and use of coalesce(1) to generate a unique csv per write action
-- step 7 : move the csv file from datalake/ingress/ to datalake/archive/<source>/, to prevent for recomputing twice the same file
+- step 6 : write the two Dataframes as csv on the folder datalake/raw/valid/product_catalog/ and datalake/raw/invalid/<source>/, keeping the header and use of coalesce(1) to generate a unique csv per write action
+- step 7 : move the csv file from datalake/ingress/ to datalake/archive/product_catalog/, to prevent for recomputing twice the same file
 
 
 #### errors handling et overwrite
