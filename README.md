@@ -128,6 +128,7 @@ Spark has been designed to be used on a cluster of servers. For bigger files, I 
 - storing data locally is not a good idea : better to use an AWS S3 Bucket with the same architecture than the datalake folder. The transform.py script must be readapted to interact with an S3 Bucket : the given paths to the spark-submit can be changed without rewritting the code but all the functions that work with linux system (like os.mkdir()) must be readapted for a S3 Bucket environment. Be sure that the IAM roles and policies of the EMR Cluster are compliant to work with your S3 Bucket.
 - All coalesce(1) must be getting out of the code because they will break down performance on big dataset : to have a unique parquet or csv file, will forced spark to have a unique partition on a single node. A better solution would be to have each slave nodes writing their own parts.
 - To run the script on a batch of data, you can use pattern to get all the files product_catalog_timestamp.csv and then make a loop to compute the job for all the files that match the given pattern.
+- For error handling I would suggest to use an orchestrator like Airflow or Oozie. Also, log files must be written out of the Spark cluster, in a specific zone of the S3 Bucket for example.
 
 
 ### PartitionBy Approach
