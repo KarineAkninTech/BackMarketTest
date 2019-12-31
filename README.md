@@ -135,6 +135,6 @@ Spark has been designed to be used on a cluster of servers. For bigger files, I 
 The actual approach of filtering twice the same cached dataframe to generate valid and invalid data envolves computing twice the same dataframe. Another approach can be done :
 - generating an extra column to the dataframe : withcolumn('flag') and when(col('image') != Null, 'valid').otherwise('invalid'). This extra column 'flag' will contain 'valid' or 'invalid' depending of col('image') values.
 - then write the dataframe to csv using partitionBy('flag') method, will automatically generate two partitions : one for valid and another for invalid data
-- you must combine partitionBy() with repartitionBy() to be sure that multiple Parts would be generated per partitions : it is not a good idea to have only one Part per partition on big dataset.
+- you must combine partitionBy() with repartition() to be sure that multiple Parts would be generated per partitions : it is not a good idea to have only one Part per partition on big dataset.
 - This technic avoids to read the dataframe twice (by filtering twice) but the repartition() method may cause a lot of shuffle. Sometimes memory actions are much more speed that actions involving network. The two solutions must be benchmarked to take a good decision for production level
 - Also, partitioning on disk is generaly used to speedup futur queries : here, one of the partition may be never used, that's why I choose the filtering twice approach.
